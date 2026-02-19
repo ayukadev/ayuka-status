@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ayuka — Statut</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a12;
+      --surface: #12121e;
+      --surface2: #1a1a2e;
+      --border: rgba(114, 97, 218, 0.18);
+      --purple: #7261da;
+      --purple-light: #9b8ef0;
+      --purple-glow: rgba(114, 97, 218, 0.3);
+      --green: #4ade80;
+      --green-glow: rgba(74, 222, 128, 0.25);
+      --red: #f87171;
+      --red-glow: rgba(248, 113, 113, 0.25);
+      --text: #e8e6f0;
+      --muted: #6b6880;
+      --mono: 'DM Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Fond animé */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(114,97,218,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 80%, rgba(91,72,196,0.08) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(114,97,218,0.04) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Grille de fond */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(114,97,218,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(114,97,218,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 60px 24px 100px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 56px;
+      animation: fadeDown 0.7s ease both;
+    }
+
+    .bot-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple), #4b3fa0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      box-shadow: 0 0 30px var(--purple-glow), 0 0 60px rgba(114,97,218,0.1);
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .bot-avatar::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple-light), transparent, var(--purple));
+      z-index: -1;
+      opacity: 0.6;
+    }
+
+    .header-text h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #fff 30%, var(--purple-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+    }
+
+    .header-text p {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    /* Badge statut global */
+    .global-status {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 28px;
+      margin-bottom: 32px;
+      animation: fadeDown 0.7s 0.1s ease both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .global-status::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--purple), transparent);
+      opacity: 0.5;
+    }
+
+    .status-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .status-dot.online {
+      background: var(--green);
+      box-shadow: 0 0 12px var(--green-glow);
+    }
+
+    .status-dot.online::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: var(--green);
+      opacity: 0.2;
+      animation: pulse 2s ease infinite;
+    }
+
+    .status-dot.offline {
+      background: var(--red);
+      box-shadow: 0 0 12px var(--red-glow);
+    }
+
+    .status-label {
+      flex: 1;
+    }
+
+    .status-label strong {
+      display: block;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .status-label span {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .status-badge {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 999px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .status-badge.online {
+      background: rgba(74, 222, 128, 0.12);
+      color: var(--green);
+      border: 1px solid rgba(74, 222, 128, 0.25);
+    }
+
+    .status-badge.offline {
+      background: rgba(248, 113, 113, 0.12);
+      color: var(--red);
+      border: 1px solid rgba(248, 113, 113, 0.25);
+    }
+
+    /* Grille de métriques */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    @media (max-width: 560px) {
+      .metrics-grid { grid-template-columns: 1fr; }
+    }
+
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 20px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .metric-card:hover {
+      border-color: rgba(114, 97, 218, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .metric-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--purple), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .metric-card:hover::after { opacity: 1; }
+
+    .metric-card:nth-child(1) { animation-delay: 0.15s; }
+    .metric-card:nth-child(2) { animation-delay: 0.22s; }
+    .metric-card:nth-child(3) { animation-delay: 0.29s; }
+
+    .metric-icon {
+      font-size: 1.3rem;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .metric-label {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .metric-value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1;
+      letter-spacing: -0.5px;
+    }
+
+    .metric-value.loading {
+      color: var(--muted);
+      font-size: 1.2rem;
+    }
+
+    .metric-sub {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Historique uptime */
+    .section-title {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      animation: fadeUp 0.6s 0.35s ease both;
+    }
+
+    .uptime-bar {
+      display: flex;
+      gap: 3px;
+      align-items: flex-end;
+      height: 48px;
+      margin-bottom: 32px;
+      animation: fadeUp 0.6s 0.4s ease both;
+    }
+
+    .uptime-bar-segment {
+      flex: 1;
+      border-radius: 3px;
+      transition: transform 0.2s;
+      cursor: default;
+      position: relative;
+    }
+
+    .uptime-bar-segment:hover { transform: scaleY(1.15); }
+
+    .uptime-bar-segment.up {
+      background: linear-gradient(to top, #2d6a46, var(--green));
+      height: 100%;
+    }
+
+    .uptime-bar-segment.down {
+      background: linear-gradient(to top, #6a2d2d, var(--red));
+      height: 40%;
+    }
+
+    .uptime-bar-segment.partial {
+      background: linear-gradient(to top, #6a5a2d, #facc15);
+      height: 70%;
+    }
+
+    /* Footer */
+    .page-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      animation: fadeUp 0.6s 0.5s ease both;
+    }
+
+    .page-footer p {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    .last-update {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .update-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--purple);
+      animation: pulse 2s ease infinite;
+    }
+
+    /* Animations */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(1.5); }
+    }
+
+    @keyframes countUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header>
+      <div class="bot-avatar">🤖</div>
+      <div class="header-text">
+        <h1>Ayuka</h1>
+        <p>// page de statut du bot</p>
+      </div>
+    </header>
+
+    <div class="global-status" id="globalStatus">
+      <div class="status-dot online" id="statusDot"></div>
+      <div class="status-label">
+        <strong id="statusText">Opérationnel</strong>
+        <span id="statusSince">Chargement...</span>
+      </div>
+      <span class="status-badge online" id="statusBadge">En ligne</span>
+    </div>
+
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <span class="metric-icon">⚡</span>
+        <div class="metric-label">Latence</div>
+        <div class="metric-value" id="latency">—</div>
+        <div class="metric-sub">ms</div>
+      </div>
+      <div class="metric-card">
+        <span class="metric-icon">⏱️</span>
+        <div class="metric-label">Uptime</div>
+        <div class="metric-value" id="uptime">—</div>
+        <div class="metric-sub" id="uptimeDetail">depuis le démarrage</div>
+      </div>
+      <div class="metric-card">
+        <span class="metric-icon">👥</span>
+        <div class="metric-label">Membres</div>
+        <div class="metric-value" id="members">—</div>
+        <div class="metric-sub">sur le serveur</div>
+      </div>
+    </div>
+
+    <div class="section-title">— historique 30 jours</div>
+    <div class="uptime-bar" id="uptimeBar"></div>
+
+    <footer class="page-footer">
+      <p>Ayuka Bot · Privé</p>
+      <div class="last-update">
+        <div class="update-dot"></div>
+        <span id="lastUpdate">Mise à jour à l'instant</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    // =============================================
+    // CONFIGURATION — À modifier selon ton setup
+    // =============================================
+    const API_URL = "https://ton-api.com/status";
+    // Données de fallback si pas encore d'API
+    const MOCK_DATA = {
+      online: true,
+      latency: 42,
+      uptime_seconds: 3 * 86400 + 7 * 3600 + 23 * 60,
+      members: 284,
+      since: Date.now() - (3 * 86400 + 7 * 3600 + 23 * 60) * 1000
+    };
+    // =============================================
+
+    function formatUptime(seconds) {
+      const d = Math.floor(seconds / 86400);
+      const h = Math.floor((seconds % 86400) / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      if (d > 0) return `${d}j ${h}h`;
+      if (h > 0) return `${h}h ${m}m`;
+      return `${m}m`;
+    }
+
+    function formatSince(timestamp) {
+      const diff = Math.floor((Date.now() - timestamp) / 1000);
+      if (diff < 60) return `depuis ${diff}s`;
+      if (diff < 3600) return `depuis ${Math.floor(diff/60)}min`;
+      if (diff < 86400) return `depuis ${Math.floor(diff/3600)}h`;
+      return `depuis ${Math.floor(diff/86400)}j`;
+    }
+
+    function generateUptimeBar() {
+      const bar = document.getElementById('uptimeBar');
+      // Simulation 30 jours (à remplacer par des vraies données)
+      for (let i = 0; i < 30; i++) {
+        const seg = document.createElement('div');
+        const rand = Math.random();
+        seg.className = 'uptime-bar-segment ' + (rand > 0.93 ? 'down' : rand > 0.88 ? 'partial' : 'up');
+        seg.title = rand > 0.93 ? 'Hors ligne' : rand > 0.88 ? 'Dégradé' : 'Opérationnel';
+        seg.style.animationDelay = `${i * 20}ms`;
+        bar.appendChild(seg);
+      }
+    }
+
+    function applyData(data) {
+      const isOnline = data.online;
+
+      // Statut global
+      const dot = document.getElementById('statusDot');
+      const badge = document.getElementById('statusBadge');
+      const text = document.getElementById('statusText');
+      const since = document.getElementById('statusSince');
+
+      dot.className = 'status-dot ' + (isOnline ? 'online' : 'offline');
+      badge.className = 'status-badge ' + (isOnline ? 'online' : 'offline');
+      badge.textContent = isOnline ? 'En ligne' : 'Hors ligne';
+      text.textContent = isOnline ? 'Tous les systèmes opérationnels' : 'Bot hors ligne';
+      since.textContent = formatSince(data.since);
+
+      // Métriques
+      document.getElementById('latency').textContent = isOnline ? data.latency : '—';
+      document.getElementById('uptime').textContent = isOnline ? formatUptime(data.uptime_seconds) : '—';
+      document.getElementById('members').textContent = data.members.toLocaleString('fr-FR');
+
+      // Heure de mise à jour
+      const now = new Date();
+      document.getElementById('lastUpdate').textContent =
+        `Mis à jour à ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+    }
+
+    async function fetchStatus() {
+      try {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        applyData(data);
+      } catch {
+        // Utilise les données mock en attendant l'API
+        applyData(MOCK_DATA);
+      }
+    }
+
+    // Init
+    generateUptimeBar();
+    fetchStatus();
+    // Rafraîchissement toutes les 30 secondes
+    setInterval(fetchStatus, 30000);
+  </script>
+</body>
+</html>
