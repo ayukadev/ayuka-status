@@ -304,6 +304,7 @@
     .uptime-bar-segment.up { background: linear-gradient(to top, #2d6a46, var(--green)); height: 100%; }
     .uptime-bar-segment.down { background: linear-gradient(to top, #6a2d2d, var(--red)); height: 40%; }
     .uptime-bar-segment.partial { background: linear-gradient(to top, #6a5a2d, #facc15); height: 70%; }
+    .uptime-bar-segment.unknown { background: var(--surface2); border: 1px solid var(--border); height: 100%; opacity: 0.5; }
 
     .page-footer {
       display: flex;
@@ -409,7 +410,7 @@
     // CONFIGURATION
     // =============================================
     const JSONBIN_BIN_ID = "69974765ae596e708f37ddc1";
-    const JSONBIN_API_KEY = "$2a$10$ebbbCoxcHHC8exubvUxbw.dmYeXD.jAeoBDL3BJNwiGYJmr3vbcNm"; // Ta clé publique (read-only)
+    const JSONBIN_API_KEY = "$2a$10$REMPLACE_PAR_TA_MASTER_KEY"; // Ta clé publique (read-only)
     const API_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`;
     // =============================================
 
@@ -434,9 +435,8 @@
       const bar = document.getElementById('uptimeBar');
       for (let i = 0; i < 30; i++) {
         const seg = document.createElement('div');
-        const rand = Math.random();
-        seg.className = 'uptime-bar-segment ' + (rand > 0.93 ? 'down' : rand > 0.88 ? 'partial' : 'up');
-        seg.title = rand > 0.93 ? 'Hors ligne' : rand > 0.88 ? 'Dégradé' : 'Opérationnel';
+        seg.className = 'uptime-bar-segment unknown';
+        seg.title = 'Aucune donnée';
         bar.appendChild(seg);
       }
     }
@@ -480,7 +480,7 @@
 
     generateUptimeBar();
     fetchStatus();
-    setInterval(fetchStatus, 300000);
+    setInterval(fetchStatus, 30000);
   </script>
 </body>
 </html>
