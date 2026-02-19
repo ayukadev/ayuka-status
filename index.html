@@ -406,13 +406,10 @@
   </div>
 
   <script>
-    // =============================================
-    // CONFIGURATION
-    // =============================================
-    const JSONBIN_BIN_ID = "69974765ae596e708f37ddc1";
-    const JSONBIN_API_KEY = '$2a$10$ebbbCoxcHHC8exubvUxbw.dmYeXD.jAeoBDL3BJNwiGYJmr3vbcNm'; // Ta clé publique (read-only)
+    const JSONBIN_BIN_ID = '69974765ae596e708f37ddc1';
     const API_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`;
-    // =============================================
+
+    let cachedData = null;
 
     function formatUptime(seconds) {
       const d = Math.floor(seconds / 86400);
@@ -441,23 +438,28 @@
       }
     }
 
+    function updateCounters() {
+      if (!cachedData || !cachedData.online) return;
+      const uptimeSeconds = Math.floor((Date.now() - cachedData.since) / 1000);
+      document.getElementById('uptime').textContent = formatUptime(uptimeSeconds);
+      document.getElementById('statusSince').textContent = formatSince(cachedData.since);
+    }
+
     function applyData(data) {
+      cachedData = data;
       const isOnline = data.online;
 
-      const dot = document.getElementById('statusDot');
-      const badge = document.getElementById('statusBadge');
-      const text = document.getElementById('statusText');
-      const since = document.getElementById('statusSince');
-
-      dot.className = 'status-dot ' + (isOnline ? 'online' : 'offline');
-      badge.className = 'status-badge ' + (isOnline ? 'online' : 'offline');
-      badge.textContent = isOnline ? 'En ligne' : 'Hors ligne';
-      text.textContent = isOnline ? 'Tous les systèmes opérationnels' : 'Bot hors ligne';
-      since.textContent = data.since ? formatSince(data.since) : '';
-
+      document.getElementById('statusDot').className = 'status-dot ' + (isOnline ? 'online' : 'offline');
+      document.getElementById('statusBadge').className = 'status-badge ' + (isOnline ? 'online' : 'offline');
+      document.getElementById('statusBadge').textContent = isOnline ? 'En ligne' : 'Hors ligne';
+      document.getElementById('statusText').textContent = isOnline ? 'Tous les systèmes opérationnels' : 'Bot hors ligne';
       document.getElementById('latency').textContent = isOnline ? data.latency : '—';
-      document.getElementById('uptime').textContent = isOnline ? formatUptime(data.uptime_seconds) : '—';
       document.getElementById('members').textContent = data.members ? data.members.toLocaleString('fr-FR') : '—';
+
+      if (!isOnline) {
+        document.getElementById('uptime').textContent = '—';
+        document.getElementById('statusSince').textContent = '';
+      }
 
       const now = new Date();
       document.getElementById('lastUpdate').textContent =
@@ -466,9 +468,7 @@
 
     async function fetchStatus() {
       try {
-        const res = await fetch(API_URL, {
-          headers: { "X-Master-Key": JSONBIN_API_KEY }
-        });
+        const res = await fetch(API_URL);
         if (!res.ok) throw new Error();
         const json = await res.json();
         applyData(json.record);
@@ -481,6 +481,7 @@
     generateUptimeBar();
     fetchStatus();
     setInterval(fetchStatus, 300000);
+    setInterval(updateCounters, 1000);
   </script>
 </body>
 </html>
