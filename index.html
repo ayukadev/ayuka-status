@@ -223,15 +223,7 @@
     .last-update { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
     .update-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--purple); animation: pulse 2s ease infinite; }
 
-    /* Bouton admin engrenage */
-    .admin-gear {
-      position: fixed; bottom: 20px; right: 20px;
-      width: 32px; height: 32px;
-      background: none; border: none; cursor: pointer;
-      font-size: 18px; opacity: 0.15;
-      transition: opacity 0.3s; z-index: 50;
-    }
-    .admin-gear:hover { opacity: 0.5; }
+
 
     /* Overlay */
     .overlay {
@@ -351,8 +343,6 @@
     </footer>
   </div>
 
-  <!-- Bouton engrenage admin -->
-  <button class="admin-gear" id="adminGearBtn" title="Admin">⚙️</button>
 
   <!-- Modal login -->
   <div class="overlay" id="loginOverlay">
@@ -531,13 +521,18 @@
       }
     }
 
-    // Bouton engrenage
-    document.getElementById('adminGearBtn').addEventListener('click', () => {
-      document.getElementById('loginOverlay').classList.add('visible');
-      document.getElementById('pass1').value = '';
-      document.getElementById('pass2').value = '';
-      document.getElementById('loginError').classList.remove('visible');
+    // Raccourci secret : Shift + A + Y simultanément
+    const keysHeld = new Set();
+    document.addEventListener('keydown', (e) => {
+      keysHeld.add(e.key);
+      if (keysHeld.has('A') && keysHeld.has('Y') && keysHeld.has('Shift')) {
+        document.getElementById('loginOverlay').classList.add('visible');
+        document.getElementById('pass1').value = '';
+        document.getElementById('pass2').value = '';
+        document.getElementById('loginError').classList.remove('visible');
+      }
     });
+    document.addEventListener('keyup', (e) => { keysHeld.delete(e.key); });
 
     document.getElementById('loginClose').addEventListener('click', () => {
       document.getElementById('loginOverlay').classList.remove('visible');
