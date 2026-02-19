@@ -18,6 +18,8 @@
       --green-glow: rgba(74, 222, 128, 0.25);
       --red: #f87171;
       --red-glow: rgba(248, 113, 113, 0.25);
+      --yellow: #fbbf24;
+      --yellow-glow: rgba(251, 191, 36, 0.25);
       --text: #e8e6f0;
       --muted: #6b6880;
       --mono: 'DM Mono', monospace;
@@ -59,6 +61,24 @@
       z-index: 0;
     }
 
+    /* Bannière maintenance */
+    .maintenance-banner {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: linear-gradient(90deg, rgba(251,191,36,0.15), rgba(251,191,36,0.08));
+      border-bottom: 1px solid rgba(251,191,36,0.3);
+      padding: 12px 24px;
+      z-index: 100;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--yellow);
+      backdrop-filter: blur(10px);
+    }
+
+    .maintenance-banner.visible { display: block; }
+
     .container {
       max-width: 760px;
       margin: 0 auto;
@@ -66,6 +86,8 @@
       position: relative;
       z-index: 1;
     }
+
+    .container.with-banner { padding-top: 110px; }
 
     header {
       display: flex;
@@ -76,230 +98,114 @@
     }
 
     .bot-avatar {
-      width: 64px;
-      height: 64px;
+      width: 64px; height: 64px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--purple), #4b3fa0);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       font-size: 28px;
       box-shadow: 0 0 30px var(--purple-glow), 0 0 60px rgba(114,97,218,0.1);
-      flex-shrink: 0;
-      position: relative;
+      flex-shrink: 0; position: relative;
     }
 
     .bot-avatar::after {
-      content: '';
-      position: absolute;
-      inset: -2px;
-      border-radius: 50%;
+      content: ''; position: absolute; inset: -2px; border-radius: 50%;
       background: linear-gradient(135deg, var(--purple-light), transparent, var(--purple));
-      z-index: -1;
-      opacity: 0.6;
+      z-index: -1; opacity: 0.6;
     }
 
     .header-text h1 {
-      font-size: 2rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
+      font-size: 2rem; font-weight: 800; letter-spacing: -0.5px;
       background: linear-gradient(135deg, #fff 30%, var(--purple-light));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      line-height: 1.1;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; line-height: 1.1;
     }
 
     .header-text p {
-      font-family: var(--mono);
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin-top: 4px;
-      letter-spacing: 0.05em;
+      font-family: var(--mono); font-size: 0.75rem; color: var(--muted);
+      margin-top: 4px; letter-spacing: 0.05em;
     }
 
     .global-status {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px 28px;
-      margin-bottom: 32px;
+      display: flex; align-items: center; gap: 16px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px 28px; margin-bottom: 32px;
       animation: fadeDown 0.7s 0.1s ease both;
-      position: relative;
-      overflow: hidden;
+      position: relative; overflow: hidden; transition: border-color 0.3s;
     }
 
     .global-status::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
       background: linear-gradient(90deg, transparent, var(--purple), transparent);
       opacity: 0.5;
     }
 
+    .global-status.maintenance { border-color: rgba(251,191,36,0.3); }
+    .global-status.maintenance::before {
+      background: linear-gradient(90deg, transparent, var(--yellow), transparent);
+    }
+
     .status-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      position: relative;
+      width: 14px; height: 14px; border-radius: 50%;
+      flex-shrink: 0; position: relative;
     }
 
-    .status-dot.online {
-      background: var(--green);
-      box-shadow: 0 0 12px var(--green-glow);
-    }
-
+    .status-dot.online { background: var(--green); box-shadow: 0 0 12px var(--green-glow); }
     .status-dot.online::after {
-      content: '';
-      position: absolute;
-      inset: -4px;
-      border-radius: 50%;
-      background: var(--green);
-      opacity: 0.2;
-      animation: pulse 2s ease infinite;
+      content: ''; position: absolute; inset: -4px; border-radius: 50%;
+      background: var(--green); opacity: 0.2; animation: pulse 2s ease infinite;
     }
-
-    .status-dot.offline {
-      background: var(--red);
-      box-shadow: 0 0 12px var(--red-glow);
+    .status-dot.offline { background: var(--red); box-shadow: 0 0 12px var(--red-glow); }
+    .status-dot.maintenance { background: var(--yellow); box-shadow: 0 0 12px var(--yellow-glow); }
+    .status-dot.maintenance::after {
+      content: ''; position: absolute; inset: -4px; border-radius: 50%;
+      background: var(--yellow); opacity: 0.2; animation: pulse 2s ease infinite;
     }
 
     .status-label { flex: 1; }
-
-    .status-label strong {
-      display: block;
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .status-label span {
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      color: var(--muted);
-    }
+    .status-label strong { display: block; font-size: 1rem; font-weight: 700; color: var(--text); }
+    .status-label span { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
 
     .status-badge {
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      font-weight: 500;
-      padding: 6px 14px;
-      border-radius: 999px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      font-family: var(--mono); font-size: 0.7rem; font-weight: 500;
+      padding: 6px 14px; border-radius: 999px;
+      letter-spacing: 0.08em; text-transform: uppercase;
     }
 
-    .status-badge.online {
-      background: rgba(74, 222, 128, 0.12);
-      color: var(--green);
-      border: 1px solid rgba(74, 222, 128, 0.25);
-    }
+    .status-badge.online { background: rgba(74,222,128,0.12); color: var(--green); border: 1px solid rgba(74,222,128,0.25); }
+    .status-badge.offline { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.25); }
+    .status-badge.maintenance { background: rgba(251,191,36,0.12); color: var(--yellow); border: 1px solid rgba(251,191,36,0.25); }
 
-    .status-badge.offline {
-      background: rgba(248, 113, 113, 0.12);
-      color: var(--red);
-      border: 1px solid rgba(248, 113, 113, 0.25);
-    }
-
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-
-    @media (max-width: 560px) {
-      .metrics-grid { grid-template-columns: 1fr; }
-    }
+    .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+    @media (max-width: 560px) { .metrics-grid { grid-template-columns: 1fr; } }
 
     .metric-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 22px 20px;
-      position: relative;
-      overflow: hidden;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 22px 20px;
+      position: relative; overflow: hidden;
       transition: border-color 0.3s, transform 0.3s;
       animation: fadeUp 0.6s ease both;
     }
 
-    .metric-card:hover {
-      border-color: rgba(114, 97, 218, 0.4);
-      transform: translateY(-2px);
-    }
-
+    .metric-card:hover { border-color: rgba(114,97,218,0.4); transform: translateY(-2px); }
     .metric-card::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 2px;
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
       background: linear-gradient(90deg, transparent, var(--purple), transparent);
-      opacity: 0;
-      transition: opacity 0.3s;
+      opacity: 0; transition: opacity 0.3s;
     }
-
     .metric-card:hover::after { opacity: 1; }
     .metric-card:nth-child(1) { animation-delay: 0.15s; }
     .metric-card:nth-child(2) { animation-delay: 0.22s; }
     .metric-card:nth-child(3) { animation-delay: 0.29s; }
 
     .metric-icon { font-size: 1.3rem; margin-bottom: 12px; display: block; }
+    .metric-label { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+    .metric-value { font-size: 1.6rem; font-weight: 800; color: var(--text); line-height: 1; letter-spacing: -0.5px; }
+    .metric-sub { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); margin-top: 4px; }
 
-    .metric-label {
-      font-family: var(--mono);
-      font-size: 0.68rem;
-      color: var(--muted);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
+    .section-title { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 14px; animation: fadeUp 0.6s 0.35s ease both; }
 
-    .metric-value {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: var(--text);
-      line-height: 1;
-      letter-spacing: -0.5px;
-    }
-
-    .metric-sub {
-      font-family: var(--mono);
-      font-size: 0.68rem;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .section-title {
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      color: var(--muted);
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin-bottom: 14px;
-      animation: fadeUp 0.6s 0.35s ease both;
-    }
-
-    .uptime-bar {
-      display: flex;
-      gap: 3px;
-      align-items: flex-end;
-      height: 48px;
-      margin-bottom: 32px;
-      animation: fadeUp 0.6s 0.4s ease both;
-    }
-
-    .uptime-bar-segment {
-      flex: 1;
-      border-radius: 3px;
-      transition: transform 0.2s;
-      cursor: default;
-    }
-
+    .uptime-bar { display: flex; gap: 3px; align-items: flex-end; height: 48px; margin-bottom: 32px; animation: fadeUp 0.6s 0.4s ease both; }
+    .uptime-bar-segment { flex: 1; border-radius: 3px; transition: transform 0.2s; cursor: default; }
     .uptime-bar-segment:hover { transform: scaleY(1.15); }
     .uptime-bar-segment.up { background: linear-gradient(to top, #2d6a46, var(--green)); height: 100%; }
     .uptime-bar-segment.down { background: linear-gradient(to top, #6a2d2d, var(--red)); height: 40%; }
@@ -307,54 +213,94 @@
     .uptime-bar-segment.unknown { background: var(--surface2); border: 1px solid var(--border); height: 100%; opacity: 0.5; }
 
     .page-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 48px;
-      padding-top: 24px;
-      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border);
       animation: fadeUp 0.6s 0.5s ease both;
     }
 
-    .page-footer p {
-      font-family: var(--mono);
-      font-size: 0.68rem;
-      color: var(--muted);
+    .page-footer p { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); }
+
+    .last-update { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+    .update-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--purple); animation: pulse 2s ease infinite; }
+
+    /* Bouton admin engrenage */
+    .admin-gear {
+      position: fixed; bottom: 20px; right: 20px;
+      width: 32px; height: 32px;
+      background: none; border: none; cursor: pointer;
+      font-size: 18px; opacity: 0.15;
+      transition: opacity 0.3s; z-index: 50;
+    }
+    .admin-gear:hover { opacity: 0.5; }
+
+    /* Overlay */
+    .overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+      z-index: 200; align-items: center; justify-content: center;
+    }
+    .overlay.visible { display: flex; }
+
+    /* Modal */
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; padding: 36px; width: 100%; max-width: 420px;
+      margin: 24px; position: relative; animation: fadeUp 0.3s ease both;
     }
 
-    .last-update {
-      font-family: var(--mono);
-      font-size: 0.68rem;
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+    .modal h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 6px; }
+    .modal p { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); margin-bottom: 24px; }
 
-    .update-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--purple);
-      animation: pulse 2s ease infinite;
+    .modal-input {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 16px; color: var(--text);
+      font-family: var(--mono); font-size: 0.85rem; margin-bottom: 12px;
+      outline: none; transition: border-color 0.2s;
     }
+    .modal-input:focus { border-color: var(--purple); }
 
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-16px); }
-      to   { opacity: 1; transform: translateY(0); }
+    .modal-btn {
+      width: 100%; padding: 12px; border-radius: 10px; border: none;
+      font-family: var(--sans); font-size: 0.9rem; font-weight: 700;
+      cursor: pointer; transition: opacity 0.2s; margin-top: 4px;
     }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
+    .modal-btn.primary { background: var(--purple); color: #fff; }
+    .modal-btn.primary:hover { opacity: 0.85; }
+    .modal-btn.danger { background: rgba(248,113,113,0.15); color: var(--red); border: 1px solid rgba(248,113,113,0.3); margin-top: 8px; }
+    .modal-btn.danger:hover { background: rgba(248,113,113,0.25); }
+    .modal-btn.success { background: rgba(251,191,36,0.15); color: var(--yellow); border: 1px solid rgba(251,191,36,0.3); }
+    .modal-btn.success:hover { background: rgba(251,191,36,0.25); }
+
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      background: none; border: none; color: var(--muted);
+      font-size: 1.2rem; cursor: pointer; padding: 4px;
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.5; transform: scale(1.5); }
+    .modal-close:hover { color: var(--text); }
+
+    .modal-error { font-family: var(--mono); font-size: 0.72rem; color: var(--red); margin-top: 8px; display: none; }
+    .modal-error.visible { display: block; }
+
+    .admin-status {
+      font-family: var(--mono); font-size: 0.72rem; padding: 10px 14px;
+      border-radius: 8px; margin-bottom: 16px; text-align: center;
     }
+    .admin-status.on { background: rgba(251,191,36,0.1); color: var(--yellow); border: 1px solid rgba(251,191,36,0.2); }
+    .admin-status.off { background: rgba(74,222,128,0.1); color: var(--green); border: 1px solid rgba(74,222,128,0.2); }
+
+    .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.5); } }
   </style>
 </head>
 <body>
-  <div class="container">
+
+  <!-- Bannière maintenance -->
+  <div class="maintenance-banner" id="maintenanceBanner"></div>
+
+  <div class="container" id="mainContainer">
     <header>
       <div class="bot-avatar">🤖</div>
       <div class="header-text">
@@ -363,7 +309,7 @@
       </div>
     </header>
 
-    <div class="global-status">
+    <div class="global-status" id="globalStatus">
       <div class="status-dot online" id="statusDot"></div>
       <div class="status-label">
         <strong id="statusText">Chargement...</strong>
@@ -405,9 +351,53 @@
     </footer>
   </div>
 
+  <!-- Bouton engrenage admin -->
+  <button class="admin-gear" id="adminGearBtn" title="Admin">⚙️</button>
+
+  <!-- Modal login -->
+  <div class="overlay" id="loginOverlay">
+    <div class="modal">
+      <button class="modal-close" id="loginClose">✕</button>
+      <h2>🔐 Accès admin</h2>
+      <p>Entrez les deux mots de passe pour continuer.</p>
+      <input class="modal-input" type="password" id="pass1" placeholder="Mot de passe 1" />
+      <input class="modal-input" type="password" id="pass2" placeholder="Mot de passe 2" />
+      <div class="modal-error" id="loginError">Mots de passe incorrects.</div>
+      <button class="modal-btn primary" id="loginBtn">Connexion</button>
+    </div>
+  </div>
+
+  <!-- Modal admin panel -->
+  <div class="overlay" id="adminOverlay">
+    <div class="modal">
+      <button class="modal-close" id="adminClose">✕</button>
+      <h2>⚙️ Admin Panel</h2>
+      <p>Gestion de la maintenance du bot.</p>
+
+      <div class="admin-status off" id="adminStatusLabel">✅ Aucune maintenance en cours</div>
+
+      <div class="divider"></div>
+
+      <input class="modal-input" type="text" id="maintMessage" placeholder="Message de maintenance..." />
+      <input class="modal-input" type="text" id="maintUntil" placeholder="Prévue jusqu'à... (ex: 20h30)" />
+      <button class="modal-btn success" id="startMaintBtn">🟡 Activer la maintenance</button>
+      <button class="modal-btn danger" id="stopMaintBtn">🔴 Arrêter la maintenance</button>
+    </div>
+  </div>
+
   <script>
+    // =============================================
+    // CONFIGURATION — À modifier
+    // =============================================
     const JSONBIN_BIN_ID = '69974765ae596e708f37ddc1';
+    const JSONBIN_API_KEY = '$2a$10$ebbbCoxcHHC8exubvUxbw.dmYeXD.jAeoBDL3BJNwiGYJmr3vbcNm';
     const API_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`;
+    const API_PUT = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+
+    // Les deux mots de passe admin — change-les !
+    const ADMIN_PASS_1 = 'motdepasse1';
+    const ADMIN_PASS_2 = 'motdepasse2';
+    // =============================================
 
     let cachedData = null;
 
@@ -447,16 +437,43 @@
 
     function applyData(data) {
       cachedData = data;
-      const isOnline = data.online;
+      const isMaintenance = data.maintenance === true;
+      const isOnline = data.online && !isMaintenance;
 
-      document.getElementById('statusDot').className = 'status-dot ' + (isOnline ? 'online' : 'offline');
-      document.getElementById('statusBadge').className = 'status-badge ' + (isOnline ? 'online' : 'offline');
-      document.getElementById('statusBadge').textContent = isOnline ? 'En ligne' : 'Hors ligne';
-      document.getElementById('statusText').textContent = isOnline ? 'Tous les systèmes opérationnels' : 'Bot hors ligne';
-      document.getElementById('latency').textContent = isOnline ? data.latency : '—';
+      const dot = document.getElementById('statusDot');
+      const badge = document.getElementById('statusBadge');
+      const text = document.getElementById('statusText');
+      const globalStatus = document.getElementById('globalStatus');
+      const banner = document.getElementById('maintenanceBanner');
+      const container = document.getElementById('mainContainer');
+
+      // Maintenance
+      if (isMaintenance) {
+        dot.className = 'status-dot maintenance';
+        badge.className = 'status-badge maintenance';
+        badge.textContent = 'Maintenance';
+        text.textContent = 'Maintenance en cours';
+        globalStatus.className = 'global-status maintenance';
+        const msg = data.maintenance_message || 'Maintenance en cours.';
+        const until = data.maintenance_until ? ` — Prévue jusqu\'à ${data.maintenance_until}` : '';
+        banner.textContent = `🔧 ${msg}${until}`;
+        banner.classList.add('visible');
+        container.classList.add('with-banner');
+        document.getElementById('statusSince').textContent = '';
+      } else {
+        globalStatus.className = 'global-status';
+        banner.classList.remove('visible');
+        container.classList.remove('with-banner');
+        dot.className = 'status-dot ' + (isOnline ? 'online' : 'offline');
+        badge.className = 'status-badge ' + (isOnline ? 'online' : 'offline');
+        badge.textContent = isOnline ? 'En ligne' : 'Hors ligne';
+        text.textContent = isOnline ? 'Tous les systèmes opérationnels' : 'Bot hors ligne';
+      }
+
+      document.getElementById('latency').textContent = data.online ? data.latency : '—';
       document.getElementById('members').textContent = data.members ? data.members.toLocaleString('fr-FR') : '—';
 
-      if (!isOnline) {
+      if (!data.online) {
         document.getElementById('uptime').textContent = '—';
         document.getElementById('statusSince').textContent = '';
       }
@@ -464,11 +481,17 @@
       const now = new Date();
       document.getElementById('lastUpdate').textContent =
         `Mis à jour à ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+
+      // Mettre à jour le panneau admin si ouvert
+      updateAdminPanel(data);
     }
 
     async function fetchStatus() {
       try {
-        const res = await fetch(API_URL, { cache: 'force-cache' });
+        const res = await fetch(API_URL, {
+          cache: 'force-cache',
+          headers: { 'X-Master-Key': JSONBIN_API_KEY }
+        });
         if (!res.ok) throw new Error();
         const json = await res.json();
         applyData(json.record);
@@ -478,6 +501,83 @@
       }
     }
 
+    async function pushData(patch) {
+      const data = { ...cachedData, ...patch };
+      await fetch(API_PUT, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Master-Key': JSONBIN_API_KEY
+        },
+        body: JSON.stringify(data)
+      });
+      cachedData = data;
+      applyData(data);
+    }
+
+    // =============================================
+    // ADMIN PANEL
+    // =============================================
+
+    function updateAdminPanel(data) {
+      const label = document.getElementById('adminStatusLabel');
+      if (!label) return;
+      if (data.maintenance) {
+        label.className = 'admin-status on';
+        label.textContent = `🟡 Maintenance active — ${data.maintenance_message || ''} ${data.maintenance_until ? 'jusqu\'à ' + data.maintenance_until : ''}`;
+      } else {
+        label.className = 'admin-status off';
+        label.textContent = '✅ Aucune maintenance en cours';
+      }
+    }
+
+    // Bouton engrenage
+    document.getElementById('adminGearBtn').addEventListener('click', () => {
+      document.getElementById('loginOverlay').classList.add('visible');
+      document.getElementById('pass1').value = '';
+      document.getElementById('pass2').value = '';
+      document.getElementById('loginError').classList.remove('visible');
+    });
+
+    document.getElementById('loginClose').addEventListener('click', () => {
+      document.getElementById('loginOverlay').classList.remove('visible');
+    });
+
+    document.getElementById('loginBtn').addEventListener('click', () => {
+      const p1 = document.getElementById('pass1').value;
+      const p2 = document.getElementById('pass2').value;
+      if (p1 === ADMIN_PASS_1 && p2 === ADMIN_PASS_2) {
+        document.getElementById('loginOverlay').classList.remove('visible');
+        document.getElementById('adminOverlay').classList.add('visible');
+        if (cachedData) updateAdminPanel(cachedData);
+      } else {
+        document.getElementById('loginError').classList.add('visible');
+      }
+    });
+
+    // Fermer le panel admin
+    document.getElementById('adminClose').addEventListener('click', () => {
+      document.getElementById('adminOverlay').classList.remove('visible');
+    });
+
+    // Activer maintenance
+    document.getElementById('startMaintBtn').addEventListener('click', async () => {
+      const msg = document.getElementById('maintMessage').value.trim() || 'Maintenance en cours.';
+      const until = document.getElementById('maintUntil').value.trim();
+      await pushData({ maintenance: true, maintenance_message: msg, maintenance_until: until });
+    });
+
+    // Arrêter maintenance
+    document.getElementById('stopMaintBtn').addEventListener('click', async () => {
+      await pushData({ maintenance: false, maintenance_message: '', maintenance_until: '' });
+    });
+
+    // Enter pour login
+    document.getElementById('pass2').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') document.getElementById('loginBtn').click();
+    });
+
+    // =============================================
     generateUptimeBar();
     fetchStatus();
     setInterval(fetchStatus, 300000);
