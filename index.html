@@ -35,7 +35,6 @@
       position: relative;
     }
 
-    /* Fond animé */
     body::before {
       content: '';
       position: fixed;
@@ -48,7 +47,6 @@
       z-index: 0;
     }
 
-    /* Grille de fond */
     body::after {
       content: '';
       position: fixed;
@@ -69,7 +67,6 @@
       z-index: 1;
     }
 
-    /* Header */
     header {
       display: flex;
       align-items: center;
@@ -121,7 +118,6 @@
       letter-spacing: 0.05em;
     }
 
-    /* Badge statut global */
     .global-status {
       display: flex;
       align-items: center;
@@ -173,9 +169,7 @@
       box-shadow: 0 0 12px var(--red-glow);
     }
 
-    .status-label {
-      flex: 1;
-    }
+    .status-label { flex: 1; }
 
     .status-label strong {
       display: block;
@@ -212,7 +206,6 @@
       border: 1px solid rgba(248, 113, 113, 0.25);
     }
 
-    /* Grille de métriques */
     .metrics-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -251,16 +244,11 @@
     }
 
     .metric-card:hover::after { opacity: 1; }
-
     .metric-card:nth-child(1) { animation-delay: 0.15s; }
     .metric-card:nth-child(2) { animation-delay: 0.22s; }
     .metric-card:nth-child(3) { animation-delay: 0.29s; }
 
-    .metric-icon {
-      font-size: 1.3rem;
-      margin-bottom: 12px;
-      display: block;
-    }
+    .metric-icon { font-size: 1.3rem; margin-bottom: 12px; display: block; }
 
     .metric-label {
       font-family: var(--mono);
@@ -279,11 +267,6 @@
       letter-spacing: -0.5px;
     }
 
-    .metric-value.loading {
-      color: var(--muted);
-      font-size: 1.2rem;
-    }
-
     .metric-sub {
       font-family: var(--mono);
       font-size: 0.68rem;
@@ -291,7 +274,6 @@
       margin-top: 4px;
     }
 
-    /* Historique uptime */
     .section-title {
       font-family: var(--mono);
       font-size: 0.7rem;
@@ -316,27 +298,13 @@
       border-radius: 3px;
       transition: transform 0.2s;
       cursor: default;
-      position: relative;
     }
 
     .uptime-bar-segment:hover { transform: scaleY(1.15); }
+    .uptime-bar-segment.up { background: linear-gradient(to top, #2d6a46, var(--green)); height: 100%; }
+    .uptime-bar-segment.down { background: linear-gradient(to top, #6a2d2d, var(--red)); height: 40%; }
+    .uptime-bar-segment.partial { background: linear-gradient(to top, #6a5a2d, #facc15); height: 70%; }
 
-    .uptime-bar-segment.up {
-      background: linear-gradient(to top, #2d6a46, var(--green));
-      height: 100%;
-    }
-
-    .uptime-bar-segment.down {
-      background: linear-gradient(to top, #6a2d2d, var(--red));
-      height: 40%;
-    }
-
-    .uptime-bar-segment.partial {
-      background: linear-gradient(to top, #6a5a2d, #facc15);
-      height: 70%;
-    }
-
-    /* Footer */
     .page-footer {
       display: flex;
       align-items: center;
@@ -370,31 +338,22 @@
       animation: pulse 2s ease infinite;
     }
 
-    /* Animations */
     @keyframes fadeDown {
       from { opacity: 0; transform: translateY(-16px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(16px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
       50%       { opacity: 0.5; transform: scale(1.5); }
-    }
-
-    @keyframes countUp {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
   <div class="container">
-
     <header>
       <div class="bot-avatar">🤖</div>
       <div class="header-text">
@@ -403,13 +362,13 @@
       </div>
     </header>
 
-    <div class="global-status" id="globalStatus">
+    <div class="global-status">
       <div class="status-dot online" id="statusDot"></div>
       <div class="status-label">
-        <strong id="statusText">Opérationnel</strong>
-        <span id="statusSince">Chargement...</span>
+        <strong id="statusText">Chargement...</strong>
+        <span id="statusSince"></span>
       </div>
-      <span class="status-badge online" id="statusBadge">En ligne</span>
+      <span class="status-badge online" id="statusBadge">...</span>
     </div>
 
     <div class="metrics-grid">
@@ -423,7 +382,7 @@
         <span class="metric-icon">⏱️</span>
         <div class="metric-label">Uptime</div>
         <div class="metric-value" id="uptime">—</div>
-        <div class="metric-sub" id="uptimeDetail">depuis le démarrage</div>
+        <div class="metric-sub">depuis le démarrage</div>
       </div>
       <div class="metric-card">
         <span class="metric-icon">👥</span>
@@ -440,25 +399,18 @@
       <p>Ayuka Bot · Privé</p>
       <div class="last-update">
         <div class="update-dot"></div>
-        <span id="lastUpdate">Mise à jour à l'instant</span>
+        <span id="lastUpdate">Chargement...</span>
       </div>
     </footer>
-
   </div>
 
   <script>
     // =============================================
-    // CONFIGURATION — À modifier selon ton setup
+    // CONFIGURATION
     // =============================================
-    const API_URL = "https://ton-api.com/status";
-    // Données de fallback si pas encore d'API
-    const MOCK_DATA = {
-      online: true,
-      latency: 42,
-      uptime_seconds: 3 * 86400 + 7 * 3600 + 23 * 60,
-      members: 284,
-      since: Date.now() - (3 * 86400 + 7 * 3600 + 23 * 60) * 1000
-    };
+    const JSONBIN_BIN_ID = "69974765ae596e708f37ddc1";
+    const JSONBIN_API_KEY = "$2a$10$REMPLACE_PAR_TA_MASTER_KEY"; // Ta clé publique (read-only)
+    const API_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`;
     // =============================================
 
     function formatUptime(seconds) {
@@ -480,13 +432,11 @@
 
     function generateUptimeBar() {
       const bar = document.getElementById('uptimeBar');
-      // Simulation 30 jours (à remplacer par des vraies données)
       for (let i = 0; i < 30; i++) {
         const seg = document.createElement('div');
         const rand = Math.random();
         seg.className = 'uptime-bar-segment ' + (rand > 0.93 ? 'down' : rand > 0.88 ? 'partial' : 'up');
         seg.title = rand > 0.93 ? 'Hors ligne' : rand > 0.88 ? 'Dégradé' : 'Opérationnel';
-        seg.style.animationDelay = `${i * 20}ms`;
         bar.appendChild(seg);
       }
     }
@@ -494,7 +444,6 @@
     function applyData(data) {
       const isOnline = data.online;
 
-      // Statut global
       const dot = document.getElementById('statusDot');
       const badge = document.getElementById('statusBadge');
       const text = document.getElementById('statusText');
@@ -504,14 +453,12 @@
       badge.className = 'status-badge ' + (isOnline ? 'online' : 'offline');
       badge.textContent = isOnline ? 'En ligne' : 'Hors ligne';
       text.textContent = isOnline ? 'Tous les systèmes opérationnels' : 'Bot hors ligne';
-      since.textContent = formatSince(data.since);
+      since.textContent = data.since ? formatSince(data.since) : '';
 
-      // Métriques
       document.getElementById('latency').textContent = isOnline ? data.latency : '—';
       document.getElementById('uptime').textContent = isOnline ? formatUptime(data.uptime_seconds) : '—';
-      document.getElementById('members').textContent = data.members.toLocaleString('fr-FR');
+      document.getElementById('members').textContent = data.members ? data.members.toLocaleString('fr-FR') : '—';
 
-      // Heure de mise à jour
       const now = new Date();
       document.getElementById('lastUpdate').textContent =
         `Mis à jour à ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
@@ -519,20 +466,20 @@
 
     async function fetchStatus() {
       try {
-        const res = await fetch(API_URL);
+        const res = await fetch(API_URL, {
+          headers: { "X-Master-Key": JSONBIN_API_KEY }
+        });
         if (!res.ok) throw new Error();
-        const data = await res.json();
-        applyData(data);
-      } catch {
-        // Utilise les données mock en attendant l'API
-        applyData(MOCK_DATA);
+        const json = await res.json();
+        applyData(json.record);
+      } catch (e) {
+        document.getElementById('statusText').textContent = 'Impossible de charger le statut';
+        document.getElementById('lastUpdate').textContent = 'Erreur de connexion';
       }
     }
 
-    // Init
     generateUptimeBar();
     fetchStatus();
-    // Rafraîchissement toutes les 30 secondes
     setInterval(fetchStatus, 30000);
   </script>
 </body>
