@@ -481,7 +481,6 @@
     async function fetchStatus() {
       try {
         const res = await fetch(API_URL, {
-          cache: 'force-cache',
           headers: { 'X-Master-Key': JSONBIN_API_KEY }
         });
         if (!res.ok) throw new Error();
