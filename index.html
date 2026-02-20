@@ -410,15 +410,51 @@
       return `depuis ${Math.floor(diff/86400)}j`;
     }
 
-    function generateUptimeBar() {
-      const bar = document.getElementById('uptimeBar');
-      for (let i = 0; i < 30; i++) {
-        const seg = document.createElement('div');
-        seg.className = 'uptime-bar-segment unknown';
-        seg.title = 'Aucune donnée';
-        bar.appendChild(seg);
-      }
+function generateUptimeBar(history) {
+  const bar = document.getElementById('uptimeBar');
+  bar.innerHTML = '';
+
+  if (!history || history.length === 0) {
+    for (let i = 0; i < 30; i++) {
+      const seg = document.createElement('div');
+      seg.className = 'uptime-bar-segment unknown';
+      seg.title = 'Aucune donnée';
+      bar.appendChild(seg);
     }
+    return;
+  }
+
+  const last30 = history.slice(-30);
+
+  last30.forEach(day => {
+    const seg = document.createElement('div');
+    seg.classList.add('uptime-bar-segment');
+
+    const pct = day.percentage || 0;
+
+    if (pct >= 95) {
+      seg.classList.add('up');
+      seg.title = `${day.date} → ${pct}% (Opérationnel)`;
+    } else if (pct >= 80) {
+      seg.classList.add('partial');
+      seg.title = `${day.date} → ${pct}% (Partial outage)`;
+    } else {
+      seg.classList.add('down');
+      seg.title = `${day.date} → ${pct}% (Major outage)`;
+    }
+
+    bar.appendChild(seg);
+  });
+
+  // compléter à 30 segments si besoin
+  const missing = 30 - last30.length;
+  for (let i = 0; i < missing; i++) {
+    const seg = document.createElement('div');
+    seg.className = 'uptime-bar-segment unknown';
+    seg.title = 'Aucune donnée';
+    bar.prepend(seg);
+  }
+}
 
     function updateCounters() {
       if (!cachedData || !cachedData.online) return;
@@ -475,6 +511,7 @@
         `Mis à jour à ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
 
       // Mettre à jour le panneau admin si ouvert
+      generateUptimeBar(data.history);
       updateAdminPanel(data);
     }
 
@@ -583,7 +620,6 @@
     });
 
     // =============================================
-    generateUptimeBar();
     fetchStatus();
     setInterval(fetchStatus, 300000);
     setInterval(updateCounters, 1000);
