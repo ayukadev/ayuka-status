@@ -155,6 +155,8 @@
       background: var(--green); opacity: 0.2; animation: pulse 2s ease infinite;
     }
     .status-dot.offline { background: var(--red); box-shadow: 0 0 12px var(--red-glow); }
+    .status-dot.unknown { background: var(--muted); }
+    .status-badge.unknown { background: rgba(107,104,128,0.12); color: var(--muted); border: 1px solid rgba(107,104,128,0.25); }
     .status-dot.maintenance { background: var(--yellow); box-shadow: 0 0 12px var(--yellow-glow); }
     .status-dot.maintenance::after {
       content: ''; position: absolute; inset: -4px; border-radius: 50%;
@@ -488,6 +490,9 @@
       } catch (e) {
         document.getElementById('statusText').textContent = 'Impossible de charger le statut';
         document.getElementById('lastUpdate').textContent = 'Erreur de connexion';
+        document.getElementById('statusDot').className = 'status-dot unknown';
+        document.getElementById('statusBadge').className = 'status-badge unknown';
+        document.getElementById('statusBadge').textContent = 'Inconnu';
       }
     }
 
@@ -501,8 +506,14 @@
         },
         body: JSON.stringify(data)
       });
-      cachedData = data;
-      applyData(data);
+      // Vider le cache et re-fetch les vraies données
+      const res = await fetch(API_URL, {
+        cache: 'no-store',
+        headers: { 'X-Master-Key': JSONBIN_API_KEY }
+      });
+      const json = await res.json();
+      cachedData = json.record;
+      applyData(json.record);
     }
 
     // =============================================
