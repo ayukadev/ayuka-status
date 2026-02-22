@@ -178,10 +178,10 @@
     .uptime-bar { display: flex; gap: 3px; align-items: flex-end; height: 48px; margin-bottom: 32px; animation: fadeUp 0.6s 0.4s ease both; }
     .uptime-bar-segment { flex: 1; border-radius: 3px; transition: transform 0.2s; cursor: default; }
     .uptime-bar-segment:hover { transform: scaleY(1.15); }
-    .uptime-bar-segment.up { background: linear-gradient(to top, #2d6a46, var(--green)); height: 100%; }
-    .uptime-bar-segment.down { background: linear-gradient(to top, #6a2d2d, var(--red)); height: 40%; }
-    .uptime-bar-segment.partial { background: linear-gradient(to top, #6a5a2d, #facc15); height: 70%; }
-    .uptime-bar-segment.unknown { background: var(--surface2); border: 1px solid var(--border); height: 100%; opacity: 0.5; }
+    .uptime-bar-segment.up { background: linear-gradient(to top, #2d6a46, var(--green)); }
+    .uptime-bar-segment.down { background: linear-gradient(to top, #6a2d2d, var(--red)); }
+    .uptime-bar-segment.partial { background: linear-gradient(to top, #6a5a2d, #facc15); }
+    .uptime-bar-segment.unknown { background: var(--surface2); border: 1px solid var(--border); opacity: 0.5; }
 
     .page-footer {
       display: flex; align-items: center; justify-content: space-between;
@@ -293,16 +293,20 @@
 
         if (!entry) {
           seg.className = 'uptime-bar-segment unknown';
+          seg.style.height = '100%';
           seg.title = dateStr + ' — Aucune donnée';
-        } else if (entry.percentage >= 95) {
-          seg.className = 'uptime-bar-segment up';
-          seg.title = dateStr + ' — ' + entry.percentage + '%';
-        } else if (entry.percentage >= 50) {
-          seg.className = 'uptime-bar-segment partial';
-          seg.title = dateStr + ' — ' + entry.percentage + '%';
         } else {
-          seg.className = 'uptime-bar-segment down';
-          seg.title = dateStr + ' — ' + entry.percentage + '%';
+          const pct = entry.percentage;
+          seg.style.height = pct + '%';
+          seg.title = dateStr + ' — ' + pct + '%';
+
+          if (pct >= 95) {
+            seg.className = 'uptime-bar-segment up';
+          } else if (pct >= 50) {
+            seg.className = 'uptime-bar-segment partial';
+          } else {
+            seg.className = 'uptime-bar-segment down';
+          }
         }
 
         bar.appendChild(seg);
