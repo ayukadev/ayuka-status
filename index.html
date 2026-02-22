@@ -61,7 +61,6 @@
       z-index: 0;
     }
 
-
     .container {
       max-width: 760px;
       margin: 0 auto;
@@ -69,7 +68,6 @@
       position: relative;
       z-index: 1;
     }
-
 
     header {
       display: flex;
@@ -120,7 +118,6 @@
       background: linear-gradient(90deg, transparent, var(--purple), transparent);
       opacity: 0.5;
     }
-
 
     .status-dot {
       width: 14px; height: 14px; border-radius: 50%;
@@ -197,19 +194,12 @@
     .last-update { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
     .update-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--purple); animation: pulse 2s ease infinite; }
 
-
-
-
-
-
-
     @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.5); } }
   </style>
 </head>
 <body>
-
 
   <div class="container" id="mainContainer">
     <header>
@@ -262,18 +252,10 @@
     </footer>
   </div>
 
-
-
-
   <script>
-    // =============================================
-    // CONFIGURATION — À modifier
-    // =============================================
     const JSONBIN_BIN_ID = '69974765ae596e708f37ddc1';
     const JSONBIN_READ_KEY = '$2a$10$Y6sN0bhGRQNLf4tEAUSDXuEzzAWkWhMVqtSv9pjJV5sowTaI1z7wK';
     const API_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`;
-
-    // =============================================
 
     let cachedData = null;
 
@@ -294,14 +276,37 @@
       return `depuis ${Math.floor(diff/86400)}j`;
     }
 
-    function generateUptimeBar() {
+    function generateUptimeBar(history) {
       const bar = document.getElementById('uptimeBar');
-      for (let i = 0; i < 30; i++) {
-        const seg = document.createElement('div');
-        seg.className = 'uptime-bar-segment unknown';
-        seg.title = 'Aucune donnée';
-        bar.appendChild(seg);
+      bar.innerHTML = '';
+
+      const days = [];
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        days.push(d.toISOString().split('T')[0]);
       }
+
+      days.forEach(dateStr => {
+        const entry = history ? history.find(h => h.date === dateStr) : null;
+        const seg = document.createElement('div');
+
+        if (!entry) {
+          seg.className = 'uptime-bar-segment unknown';
+          seg.title = dateStr + ' — Aucune donnée';
+        } else if (entry.percentage >= 95) {
+          seg.className = 'uptime-bar-segment up';
+          seg.title = dateStr + ' — ' + entry.percentage + '%';
+        } else if (entry.percentage >= 50) {
+          seg.className = 'uptime-bar-segment partial';
+          seg.title = dateStr + ' — ' + entry.percentage + '%';
+        } else {
+          seg.className = 'uptime-bar-segment down';
+          seg.title = dateStr + ' — ' + entry.percentage + '%';
+        }
+
+        bar.appendChild(seg);
+      });
     }
 
     function updateCounters() {
@@ -318,9 +323,7 @@
       const dot = document.getElementById('statusDot');
       const badge = document.getElementById('statusBadge');
       const text = document.getElementById('statusText');
-      const globalStatus = document.getElementById('globalStatus');
 
-      globalStatus.className = 'global-status';
       dot.className = 'status-dot ' + (isOnline ? 'online' : 'offline');
       badge.className = 'status-badge ' + (isOnline ? 'online' : 'offline');
       badge.textContent = isOnline ? 'En ligne' : 'Hors ligne';
@@ -338,6 +341,7 @@
       document.getElementById('lastUpdate').textContent =
         `Mis à jour à ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
 
+      generateUptimeBar(data.history);
     }
 
     async function fetchStatus() {
@@ -357,8 +361,6 @@
       }
     }
 
-
-    generateUptimeBar();
     fetchStatus();
     setInterval(fetchStatus, 300000);
     setInterval(updateCounters, 1000);
