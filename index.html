@@ -253,9 +253,7 @@
   </div>
 
   <script>
-    const JSONBIN_BIN_ID = '69974765ae596e708f37ddc1';
-    const JSONBIN_READ_KEY = '$2a$10$Y6sN0bhGRQNLf4tEAUSDXuEzzAWkWhMVqtSv9pjJV5sowTaI1z7wK';
-    const API_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`;
+    const API_URL = 'https://ayuka-bot-1.onrender.com/status';
 
     let cachedData = null;
 
@@ -350,12 +348,10 @@
 
     async function fetchStatus() {
       try {
-        const res = await fetch(API_URL, {
-          headers: { 'X-Access-Key': JSONBIN_READ_KEY }
-        });
+        const res = await fetch(API_URL);
         if (!res.ok) throw new Error();
-        const json = await res.json();
-        applyData(json.record);
+        const data = await res.json();
+        applyData(data);
       } catch (e) {
         document.getElementById('statusText').textContent = 'Impossible de charger le statut';
         document.getElementById('lastUpdate').textContent = 'Erreur de connexion';
@@ -366,7 +362,7 @@
     }
 
     fetchStatus();
-    setInterval(fetchStatus, 300000);
+    setInterval(fetchStatus, 30000);
     setInterval(updateCounters, 1000);
   </script>
 </body>
